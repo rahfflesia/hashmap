@@ -20,26 +20,35 @@ class HashMap {
     this.array[index].prepend(obj);
   }
   get(key) {
-    for (let i = 0; i < this.capacity; i++) {
-      for (let j = 0; j < this.array[i].size(); j++) {
-        if (this.array[i].at(j).value.hasOwnProperty(key)) {
-          return this.array[i].at(j).value[key];
-        }
+    let hashCode = this.hash(key);
+    let index = hashCode % this.capacity;
+    for (let i = 0; i < this.array[index].size(); i++) {
+      if (this.array[index].at(i).value.hasOwnProperty(key)) {
+        return this.array[index].at(i).value[key];
       }
     }
     return null;
   }
   has(key) {
-    for (let i = 0; i < this.capacity; i++) {
-      for (let j = 0; j < this.array[i].size(); j++) {
-        if (this.array[i].at(j).value.hasOwnProperty(key)) {
-          return true;
-        }
+    let hashCode = this.hash(key);
+    let index = hashCode % this.capacity;
+    for (let i = 0; i < this.array[index].size(); i++) {
+      if (this.array[index].at(i).value.hasOwnProperty(key)) {
+        return true;
       }
     }
     return false;
   }
-  remove(key) {}
+  remove(key) {
+    let hashCode = this.hash(key);
+    let index = hashCode % this.capacity;
+    for (let i = 0; i < this.array[index].size(); i++) {
+      if (this.has(key)) {
+        // To implement
+      }
+    }
+    return false;
+  }
   length() {
     let acum = 0;
     for (let i = 0; i < this.capacity; i++) {
@@ -174,6 +183,26 @@ class LinkedList {
     linkedList += this.tail().nextNode;
     return linkedList;
   }
+
+  removeAt(index) {
+    if (this.size() < 1 || index > this.size() - 1) {
+      return null;
+    }
+    let previousNode;
+    let adjacentNode;
+    for (let i = 0; i < this.size(); i++) {
+      if (index === this.size() - 1) {
+        this.pop();
+      } else if (index === 0 && index === i) {
+        adjacentNode = this.at(i + 1);
+        this.head = adjacentNode;
+      } else if (index > 0 && index === i) {
+        previousNode = this.at(i - 1);
+        adjacentNode = this.at(i + 1);
+        previousNode.nextNode = adjacentNode;
+      }
+    }
+  }
 }
 
 class Node {
@@ -188,10 +217,7 @@ hash.set("carrot", "orange");
 hash.set("coconut", "brown");
 hash.set("apple", "red");
 hash.set("grape", "purple");
+hash.set("cucumber", "green");
+hash.set("pineapple", "gold");
+hash.set("banana", "yellow");
 console.log(hash.array);
-console.log(hash.length());
-console.log(hash.get("apple"));
-console.log(hash.has("coconut"));
-console.log(hash.values());
-console.log(hash.keys());
-console.log(hash.entries());
