@@ -7,7 +7,7 @@ class HashMap {
     let hashCode = 0;
     const primeNumber = 37;
     for (let i = 0; i < key.length; i++) {
-      hashCode = hashCode * primeNumber + key.charCodeAt(i);
+      hashCode = (hashCode * primeNumber + key.charCodeAt(i)) % this.capacity;
     }
     return hashCode;
   }
@@ -15,23 +15,44 @@ class HashMap {
     const obj = {
       [key]: value,
     };
-    const hashCode = this.hash(key);
-    let index = hashCode % this.capacity;
+    let index = this.hash(key);
+    if (index < 0 || index >= this.capacity) {
+      throw new Error("Trying to access index out of bounds");
+    }
+    if (this.has(key)) {
+      let indexToRemove = this.array[index].find(key);
+      this.array[index].removeAt(indexToRemove);
+    }
+    if (this.length() >= Math.ceil(this.capacity * this.loadFactor)) {
+      let elements = this.entries();
+      let newArray = new Array(this.capacity * 2)
+        .fill()
+        .map(() => new LinkedList());
+      this.capacity = newArray.length;
+      this.array = newArray;
+      for (let i = 0; i < elements.length; i++) {
+        this.set(elements[i][0], elements[i][1]);
+      }
+    }
     this.array[index].prepend(obj);
   }
   get(key) {
-    let hashCode = this.hash(key);
-    let index = hashCode % this.capacity;
+    let index = this.hash(key);
+    if (index < 0 || index >= this.capacity) {
+      throw new Error("Trying to access index out of bounds");
+    }
     for (let i = 0; i < this.array[index].size(); i++) {
-      if (this.array[index].at(i).value.hasOwnProperty(key)) {
+      if (this.has(key)) {
         return this.array[index].at(i).value[key];
       }
     }
     return null;
   }
   has(key) {
-    let hashCode = this.hash(key);
-    let index = hashCode % this.capacity;
+    let index = this.hash(key);
+    if (index < 0 || index >= this.capacity) {
+      throw new Error("Trying to access index out of bounds");
+    }
     for (let i = 0; i < this.array[index].size(); i++) {
       if (this.array[index].at(i).value.hasOwnProperty(key)) {
         return true;
@@ -40,11 +61,15 @@ class HashMap {
     return false;
   }
   remove(key) {
-    let hashCode = this.hash(key);
-    let index = hashCode % this.capacity;
+    let index = this.hash(key);
+    if (index < 0 || index >= this.capacity) {
+      throw new Error("Trying to access index out of bounds");
+    }
     for (let i = 0; i < this.array[index].size(); i++) {
       if (this.has(key)) {
-        // To implement
+        let indexToRemove = this.array[index].find(key);
+        this.array[index].removeAt(indexToRemove);
+        return true;
       }
     }
     return false;
@@ -164,9 +189,9 @@ class LinkedList {
     }
     return false;
   }
-  find(val) {
+  find(key) {
     for (let i = 0; i < this.size(); i++) {
-      if (this.at(i).value === val) {
+      if (this.at(i).value.hasOwnProperty(key)) {
         return i;
       }
     }
@@ -212,12 +237,19 @@ class Node {
   }
 }
 
-const hash = new HashMap();
-hash.set("carrot", "orange");
-hash.set("coconut", "brown");
-hash.set("apple", "red");
-hash.set("grape", "purple");
-hash.set("cucumber", "green");
-hash.set("pineapple", "gold");
-hash.set("banana", "yellow");
-console.log(hash.array);
+const test = new HashMap();
+test.set("apple", "red");
+test.set("banana", "yellow");
+test.set("carrot", "orange");
+test.set("dog", "brown");
+test.set("elephant", "gray");
+test.set("frog", "green");
+test.set("grape", "purple");
+test.set("hat", "black");
+test.set("ice cream", "white");
+test.set("jacket", "blue");
+console.log(test.array);
+let a = test.keys();
+for (let i = 0; i < test.length(); i++) {
+  console.log(test.get(a[i]));
+}
