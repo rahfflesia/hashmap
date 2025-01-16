@@ -37,13 +37,11 @@ class HashMap {
     this.array[index].prepend(obj);
   }
   get(key) {
-    let index = this.hash(key);
-    if (index < 0 || index >= this.capacity) {
-      throw new Error("Trying to access index out of bounds");
-    }
-    for (let i = 0; i < this.array[index].size(); i++) {
-      if (this.has(key)) {
-        return this.array[index].at(i).value[key];
+    for (let i = 0; i < this.capacity; i++) {
+      for (let j = 0; j < this.array[i].size(); j++) {
+        if (this.array[i].at(j).value.hasOwnProperty(key)) {
+          return this.array[i].at(j).value[key];
+        }
       }
     }
     return null;
@@ -249,7 +247,3 @@ test.set("hat", "black");
 test.set("ice cream", "white");
 test.set("jacket", "blue");
 console.log(test.array);
-let a = test.keys();
-for (let i = 0; i < test.length(); i++) {
-  console.log(test.get(a[i]));
-}
